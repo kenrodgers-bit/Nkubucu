@@ -1,0 +1,13 @@
+.env*.local
+.env
+.next
+node_modules
+out
+coverage
+*.log
+dev-server.*.log
+output/playwright
+tsconfig.tsbuildinfo
+vercel
+.vercel
+dist
