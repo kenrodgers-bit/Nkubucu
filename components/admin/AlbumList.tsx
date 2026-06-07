@@ -8,6 +8,12 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Album } from "@/lib/client-types";
 
+const statusStyles = {
+  draft: "bg-amber-50 text-amber-800",
+  published: "bg-tealhub-50 text-tealhub-700",
+  hidden: "bg-slate-100 text-slate-600",
+};
+
 export function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -148,12 +154,10 @@ export function AlbumList() {
                 </p>
                 <span
                   className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    album.isPublic
-                      ? "bg-tealhub-50 text-tealhub-700"
-                      : "bg-slate-100 text-slate-600"
+                    statusStyles[album.status]
                   }`}
                 >
-                  {album.isPublic ? "Public" : "Private"}
+                  {album.status.charAt(0).toUpperCase() + album.status.slice(1)}
                 </span>
                 <div className="flex flex-wrap gap-2">
                   <Link

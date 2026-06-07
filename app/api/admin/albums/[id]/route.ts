@@ -45,10 +45,22 @@ export async function PATCH(
 
     await connectToDatabase();
 
+    const updateData: Record<string, unknown> = { ...parsed.data };
+
+    if (parsed.data.status) {
+      updateData.isPublic = parsed.data.status === "published";
+    } else if (parsed.data.isPublic !== undefined) {
+      updateData.status = parsed.data.isPublic ? "published" : "hidden";
+    }
+
+    if (parsed.data.externalLinkStatus && parsed.data.externalLinkStatus !== "unchecked") {
+      updateData.externalLinkCheckedAt = new Date();
+    }
+
     const album = await Album.findByIdAndUpdate(
       params.id,
       {
-        ...parsed.data,
+        ...updateData,
         coverImageUrl: parsed.data.coverImageUrl ?? undefined,
         coverCloudinaryId: parsed.data.coverCloudinaryId ?? undefined,
       },

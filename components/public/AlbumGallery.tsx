@@ -36,6 +36,10 @@ export function AlbumGallery({ slug }: AlbumGalleryProps) {
         if (isMounted) {
           setAlbum(data.album);
           setPhotos(data.photos);
+          fetch(`/api/albums/${slug}/view`, {
+            method: "POST",
+            keepalive: true,
+          }).catch(() => undefined);
         }
       } catch (loadError) {
         if (isMounted) {
@@ -74,6 +78,17 @@ export function AlbumGallery({ slug }: AlbumGalleryProps) {
       alt: `${album?.title ?? "Album"} preview ${index + 1}`,
     }));
   }, [album, photos]);
+
+  function recordCheckAllClick() {
+    const url = `/api/albums/${slug}/check-all`;
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url);
+      return;
+    }
+
+    fetch(url, { method: "POST", keepalive: true }).catch(() => undefined);
+  }
 
   return (
     <main className="min-h-screen bg-white">
@@ -170,6 +185,7 @@ export function AlbumGallery({ slug }: AlbumGalleryProps) {
                   href={album.externalAlbumUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={recordCheckAllClick}
                   className="focus-ring mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-md bg-green-600 px-5 text-base font-bold text-white transition hover:bg-green-700"
                 >
                   Check All Photos

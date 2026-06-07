@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Settings,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/admin/albums", label: "Albums", icon: Images },
   { href: "/admin/photos", label: "Preview Photos", icon: Images },
   { href: "/admin#stats", label: "Stats", icon: BarChart3 },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
@@ -29,10 +31,13 @@ export function AdminSidebar() {
     <nav className="mt-8 space-y-1">
       {navItems.map((item) => {
         const Icon = item.icon;
+        const baseHref = item.href.split("#")[0];
         const isActive =
-          item.href === "/admin"
+          item.href.includes("#")
+            ? pathname === baseHref
+            : item.href === "/admin"
             ? pathname === "/admin"
-            : pathname.startsWith(item.href.split("#")[0]);
+            : pathname.startsWith(baseHref);
 
         return (
           <Link

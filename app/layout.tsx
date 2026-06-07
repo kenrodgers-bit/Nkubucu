@@ -10,7 +10,6 @@ export const metadata: Metadata = {
     "A school photo preview hub that links students to complete cloud albums.",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
       {
         url: "/brand/schoolphotohub-favicon.png",
         type: "image/png",

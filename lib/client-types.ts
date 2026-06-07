@@ -11,8 +11,15 @@ export type Album = {
   previewImageUrls: string[];
   coverImageUrl: string;
   coverCloudinaryId: string;
+  status: "draft" | "published" | "hidden";
   isPublic: boolean;
   photoCount: number;
+  viewCount: number;
+  checkAllClicks: number;
+  lastViewedAt?: string;
+  lastCheckAllAt?: string;
+  externalLinkStatus: "unchecked" | "ok" | "warning" | "error";
+  externalLinkCheckedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 };

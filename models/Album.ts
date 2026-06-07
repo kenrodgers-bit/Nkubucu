@@ -54,14 +54,42 @@ const albumSchema = new Schema(
       type: String,
       default: "",
     },
+    status: {
+      type: String,
+      enum: ["draft", "published", "hidden"],
+      default: "draft",
+      index: true,
+    },
     isPublic: {
       type: Boolean,
-      default: true,
+      default: false,
       index: true,
     },
     photoCount: {
       type: Number,
       default: 0,
+    },
+    viewCount: {
+      type: Number,
+      default: 0,
+    },
+    checkAllClicks: {
+      type: Number,
+      default: 0,
+    },
+    lastViewedAt: {
+      type: Date,
+    },
+    lastCheckAllAt: {
+      type: Date,
+    },
+    externalLinkStatus: {
+      type: String,
+      enum: ["unchecked", "ok", "warning", "error"],
+      default: "unchecked",
+    },
+    externalLinkCheckedAt: {
+      type: Date,
     },
   },
   {

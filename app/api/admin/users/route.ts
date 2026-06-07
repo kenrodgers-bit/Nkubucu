@@ -1,14 +1,29 @@
+import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin-auth";
 import { missingEnvResponse, mongoEnvKeys } from "@/lib/env";
 import { connectToDatabase } from "@/lib/mongodb";
-import { serializeAlbum } from "@/lib/serializers";
-import { createAlbumSlug } from "@/lib/utils";
-import { albumSchema } from "@/lib/validators";
-import Album from "@/models/Album";
+import { adminUserSchema } from "@/lib/validators";
+import User from "@/models/User";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function serializeAdmin(user: {
+  _id: unknown;
+  name: string;
+  email: string;
+  role: string;
+  createdAt?: Date;
+}) {
+  return {
+    id: String(user._id),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+  };
+}
 
 export async function GET() {
   try {
@@ -25,13 +40,15 @@ export async function GET() {
     }
 
     await connectToDatabase();
-    const albums = await Album.find({}).sort({ createdAt: -1 }).lean();
+    const users = await User.find({ role: "admin" })
+      .sort({ createdAt: 1 })
+      .lean();
 
-    return NextResponse.json({ albums: albums.map(serializeAlbum) });
+    return NextResponse.json({ users: users.map(serializeAdmin) });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Unable to load admin albums" },
+      { error: "Unable to load admin users" },
       { status: 500 },
     );
   }
@@ -51,37 +68,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(missingEnv, { status: 503 });
     }
 
-    const body = await request.json();
-    const parsed = albumSchema.safeParse(body);
+    const parsed = adminUserSchema.safeParse(await request.json());
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid album data", details: parsed.error.flatten() },
+        { error: "Invalid admin user data", details: parsed.error.flatten() },
         { status: 400 },
       );
     }
 
     await connectToDatabase();
 
-    const status =
-      parsed.data.status ?? (parsed.data.isPublic ? "published" : "draft");
-    const album = await Album.create({
-      ...parsed.data,
-      status,
-      isPublic: status === "published",
-      slug: createAlbumSlug(parsed.data.title),
-      previewImageUrls: [],
-      coverImageUrl: parsed.data.coverImageUrl || "",
-      coverCloudinaryId: parsed.data.coverCloudinaryId || "",
-      externalLinkCheckedAt:
-        parsed.data.externalLinkStatus === "unchecked" ? undefined : new Date(),
+    const email = parsed.data.email.toLowerCase();
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "An admin with this email already exists" },
+        { status: 409 },
+      );
+    }
+
+    const user = await User.create({
+      name: parsed.data.name,
+      email,
+      role: "admin",
+      passwordHash: await bcrypt.hash(parsed.data.password, 12),
     });
 
-    return NextResponse.json({ album: serializeAlbum(album) }, { status: 201 });
+    return NextResponse.json({ user: serializeAdmin(user) }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Unable to create album" },
+      { error: "Unable to create admin user" },
       { status: 500 },
     );
   }

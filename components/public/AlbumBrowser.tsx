@@ -88,6 +88,8 @@ export function AlbumBrowser() {
     [albums],
   );
 
+  const latestAlbums = useMemo(() => albums.slice(0, 3), [albums]);
+
   return (
     <main className="min-h-screen bg-white">
       <header className="border-b border-slate-200 bg-white">
@@ -149,6 +151,40 @@ export function AlbumBrowser() {
               ))}
             </select>
           </div>
+          {events.length ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-normal text-slate-500">
+                Event categories
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEventFilter("")}
+                  className={`focus-ring rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                    eventFilter
+                      ? "border border-slate-200 bg-white text-slate-600 hover:border-tealhub-300"
+                      : "bg-tealhub-500 text-white"
+                  }`}
+                >
+                  All events
+                </button>
+                {events.map((eventName) => (
+                  <button
+                    key={eventName}
+                    type="button"
+                    onClick={() => setEventFilter(eventName)}
+                    className={`focus-ring rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+                      eventFilter === eventName
+                        ? "bg-tealhub-500 text-white"
+                        : "border border-slate-200 bg-white text-slate-600 hover:border-tealhub-300"
+                    }`}
+                  >
+                    {eventName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -184,10 +220,41 @@ export function AlbumBrowser() {
             message="Try a different album title, event, term, or year."
           />
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredAlbums.map((album) => (
-              <AlbumCard key={album.id} album={album} />
-            ))}
+          <div className="space-y-10">
+            {latestAlbums.length ? (
+              <section>
+                <div className="mb-4 flex items-end justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-ink">Latest albums</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Newest published school events.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {latestAlbums.map((album) => (
+                    <AlbumCard key={album.id} album={album} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section>
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-ink">All albums</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Showing {filteredAlbums.length} album
+                    {filteredAlbums.length === 1 ? "" : "s"}.
+                  </p>
+                </div>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredAlbums.map((album) => (
+                  <AlbumCard key={album.id} album={album} />
+                ))}
+              </div>
+            </section>
           </div>
         )}
       </section>

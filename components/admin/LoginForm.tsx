@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -105,6 +106,12 @@ export function LoginForm() {
             {isSubmitting ? "Signing in" : "Sign in"}
           </button>
         </form>
+        <Link
+          href="/admin/forgot-password"
+          className="focus-ring mt-5 inline-flex rounded-md text-sm font-semibold text-tealhub-700 hover:text-tealhub-600"
+        >
+          Forgot password?
+        </Link>
       </div>
     </main>
   );

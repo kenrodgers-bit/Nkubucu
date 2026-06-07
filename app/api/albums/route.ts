@@ -17,9 +17,14 @@ export async function GET() {
 
     await connectToDatabase();
 
-    const albums = await Album.find({ isPublic: true })
+    const albums = await Album.find({
+      $or: [
+        { status: "published", isPublic: true },
+        { status: { $exists: false }, isPublic: true },
+      ],
+    })
       .select(
-        "title slug coverImageUrl photoCount term year eventName externalAlbumUrl storageProvider previewImageUrls createdAt",
+        "title slug coverImageUrl photoCount term year eventName externalAlbumUrl storageProvider previewImageUrls status isPublic createdAt",
       )
       .sort({ createdAt: -1 })
       .lean();

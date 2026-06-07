@@ -22,6 +22,29 @@ type UploadZoneProps = {
 
 const minimumPreviewPhotos = 3;
 const maximumPreviewPhotos = 5;
+const acceptedImageExtensions = [
+  ".jpg",
+  ".jpeg",
+  ".jpe",
+  ".jfif",
+  ".png",
+  ".webp",
+  ".gif",
+  ".heic",
+  ".heif",
+  ".avif",
+  ".bmp",
+  ".tif",
+  ".tiff",
+];
+
+function isSupportedPreviewPhoto(file: File) {
+  const extension = file.name
+    .slice(Math.max(0, file.name.lastIndexOf(".")))
+    .toLowerCase();
+
+  return file.type.startsWith("image/") || acceptedImageExtensions.includes(extension);
+}
 
 export function UploadZone({ album }: UploadZoneProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -56,7 +79,7 @@ export function UploadZone({ album }: UploadZoneProps) {
         ).length;
       const availableSlots = Math.max(maximumPreviewPhotos - reservedSlots, 0);
       const nextItems = Array.from(fileList)
-        .filter((file) => file.type.startsWith("image/"))
+        .filter(isSupportedPreviewPhoto)
         .slice(0, availableSlots)
         .map((file) => ({
           id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
@@ -280,7 +303,7 @@ export function UploadZone({ album }: UploadZoneProps) {
           ref={inputRef}
           onChange={handleInputChange}
           type="file"
-          accept="image/*"
+          accept="image/*,.jpg,.jpeg,.jpe,.jfif,.png,.webp,.gif,.heic,.heif,.avif,.bmp,.tif,.tiff"
           multiple
           className="hidden"
         />
@@ -291,8 +314,8 @@ export function UploadZone({ album }: UploadZoneProps) {
           Drop preview photos here
         </p>
         <p className="mt-1 text-sm text-slate-500">
-          Choose {minimumPreviewPhotos} to {maximumPreviewPhotos} JPEG, PNG,
-          WebP, or GIF files. Maximum 15 MB each.
+          Choose {minimumPreviewPhotos} to {maximumPreviewPhotos} JPG/JFIF,
+          PNG, HEIC, HEIF, AVIF, TIFF, BMP, WebP, or GIF files. Maximum 25 MB each.
         </p>
         <button
           type="button"

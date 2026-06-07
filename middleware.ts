@@ -16,10 +16,11 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const isAdminPage = pathname.startsWith("/admin");
   const isLogin = pathname.startsWith("/admin/login");
+  const isForgotPassword = pathname.startsWith("/admin/forgot-password");
   const isAdminApi = pathname.startsWith("/api/admin");
   const hasSession = hasSessionCookie(req);
 
-  if (isAdminPage && !isLogin && !hasSession) {
+  if (isAdminPage && !isLogin && !isForgotPassword && !hasSession) {
     const loginUrl = new URL("/admin/login", req.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
